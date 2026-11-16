@@ -905,6 +905,25 @@ var DOTS=(function(){
   }
   return {run:run,mix:mix};
 })();
+/* ---------- живые числа: дни, часы и полнолуния считаются от 18.11.2018 на день просмотра ---------- */
+(function(){
+  var now=new Date(), days=Math.floor((Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())-Date.UTC(2018,10,18))/864e5);
+  if(!(days>=2922)) return;                       /* до годовщины и при сбитых часах остаются числа с карточек */
+  function pl(n,one,few,many){ var a=n%100, b=n%10; return a>10&&a<20?many:b===1?one:b>=2&&b<=4?few:many; }
+  function fmt(n,like){ var sep=(like.match(/[^\d]/)||[' '])[0]; return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,sep); }
+  var hours=days*24, moons=Math.round(days/29.530588);
+  var MAP={'2922':[days,'дня вместе',pl(days,'день','дня','дней')+' вместе'],
+           '70128':[hours,'часов с первого дня',pl(hours,'час','часа','часов')+' с первого дня'],
+           '99':[moons,'полнолуний',pl(moons,'полнолуние','полнолуния','полнолуний')]};
+  [].forEach.call(document.querySelectorAll('.slide[data-k=Stats] span,.slide[data-k=Final] span,.slide[data-k=Final] div,.slide[data-k=Final] b'),function(e){
+    if(e.children.length) return;
+    var t=e.textContent.trim(), m=MAP[t.replace(/[^\d]/g,'')];
+    if(!m||!/^[\d\s   ]+$/.test(t)) return;
+    e.textContent=fmt(m[0],t);
+    var lab=e.nextElementSibling;
+    if(lab&&!lab.children.length&&lab.textContent.trim()===m[1]) lab.textContent=m[2];
+  });
+})();
 var MODES=['scatter','river','sunflower'];
 SPECIAL.Main=function(sl,tok){
   var cv=sl.querySelector('.idots'); if(!cv) return;
